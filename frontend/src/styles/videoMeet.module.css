@@ -53,10 +53,15 @@ border-radius: 20px;
     border-radius: 20px;
 }
 
+.chatingDisplay {
+   height: calc(100% - 120px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
 
 .chatRoom{
     position: absolute;
-    height: 90vh;
+    height: 95vh;
     width: 22vw;
     right: 0;
     background-color: white;
@@ -67,9 +72,9 @@ border-radius: 20px;
 
 @media(max-width: 850px){
  .chatRoom{
-    height: 60vh;
+    height: 70vh;
     width: 30vh;
-    overflow: hidden;
+
  }
 }
 
