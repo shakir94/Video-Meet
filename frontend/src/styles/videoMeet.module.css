@@ -56,13 +56,23 @@ border-radius: 20px;
 
 .chatRoom{
     position: absolute;
-    height: 95vh;
+    height: 90vh;
     width: 22vw;
     right: 0;
     background-color: white;
     border-bottom-left-radius: 10px;
     padding-inline: 10px;
 }
+
+
+@media(max-width: 850px){
+ .chatRoom{
+    height: 60vh;
+    width: 30vh;
+    overflow: hidden;
+ }
+}
+
 
 .chatContainer{
     position:relative;
