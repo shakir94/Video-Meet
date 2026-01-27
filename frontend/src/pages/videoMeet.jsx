@@ -18,13 +18,17 @@ const server_url = server;
 
 var connections = {};
 
+
 const peerconfigConnections = {
   iceServers: [
+    
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
     { urls: "stun:stun2.l.google.com:19302" },
     { urls: "stun:stun3.l.google.com:19302" },
     { urls: "stun:stun4.l.google.com:19302" },
+    
+    
     {
       urls: "turn:openrelay.metered.ca:80",
       username: "openrelayproject",
@@ -40,6 +44,7 @@ const peerconfigConnections = {
       username: "openrelayproject",
       credential: "openrelayproject",
     },
+   
     {
       urls: "turn:numb.viagenie.ca",
       username: "webrtc@live.com",
@@ -56,6 +61,7 @@ export default function VideoMeetComponent() {
   let localVideoRef = useRef();
   let routeTo = useNavigate();
 
+  
   const pendingCandidates = useRef({});
 
   let [videoAvailable, setVideoAvailable] = useState(true);
@@ -77,6 +83,7 @@ export default function VideoMeetComponent() {
   const videoRef = useRef([]);
   let [videos, setVideos] = useState([]);
 
+  
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const getPermission = async () => {
@@ -109,7 +116,13 @@ export default function VideoMeetComponent() {
 
       if (videoAvailable || audioAvailable) {
         const userMediaStream = await navigator.mediaDevices.getUserMedia({
-          video: videoAvailable ? true : false,
+          video: videoAvailable
+            ? {
+                width: { ideal: isMobile ? 640 : 1280 },
+                height: { ideal: isMobile ? 480 : 720 },
+                frameRate: { ideal: 30, max: 30 },
+              }
+            : false,
           audio: audioAvailable
             ? {
                 echoCancellation: true,
@@ -167,6 +180,7 @@ export default function VideoMeetComponent() {
     for (let id in connections) {
       if (id === socketIdRef.current) continue;
 
+     
       const senders = connections[id].getSenders();
       senders.forEach((sender) => {
         if (sender.track) {
@@ -174,10 +188,12 @@ export default function VideoMeetComponent() {
         }
       });
 
+      
       stream.getTracks().forEach((track) => {
         connections[id].addTrack(track, stream);
       });
 
+      
       connections[id]
         .createOffer({
           offerToReceiveAudio: true,
@@ -240,7 +256,13 @@ export default function VideoMeetComponent() {
     if ((video && videoAvailable) || (audio && audioAvailable)) {
       navigator.mediaDevices
         .getUserMedia({
-          video: video ? true : false,
+          video: video
+            ? {
+                width: { ideal: isMobile ? 640 : 1280 },
+                height: { ideal: isMobile ? 480 : 720 },
+                frameRate: { ideal: 30, max: 30 },
+              }
+            : false,
           audio: audio
             ? {
                 echoCancellation: true,
@@ -336,6 +358,7 @@ export default function VideoMeetComponent() {
     }
   }, [screen]);
 
+ 
   let gotMessageFromServer = (fromId, message) => {
     var signal = JSON.parse(message);
 
@@ -344,6 +367,7 @@ export default function VideoMeetComponent() {
         connections[fromId]
           .setRemoteDescription(new RTCSessionDescription(signal.sdp))
           .then(() => {
+           
             if (pendingCandidates.current[fromId]) {
               pendingCandidates.current[fromId].forEach((candidate) => {
                 connections[fromId]
@@ -380,6 +404,7 @@ export default function VideoMeetComponent() {
       }
 
       if (signal.ice) {
+      
         if (!connections[fromId] || !connections[fromId].remoteDescription) {
           if (!pendingCandidates.current[fromId]) {
             pendingCandidates.current[fromId] = [];
@@ -429,6 +454,7 @@ export default function VideoMeetComponent() {
         setVideos((videos) => videos.filter((video) => video.socketId !== id));
       });
 
+    
       socketRef.current.on("disconnect", () => {
         console.log("Socket disconnected");
         for (let id in connections) {
@@ -461,6 +487,7 @@ export default function VideoMeetComponent() {
             peerconfigConnections
           );
 
+          
           connections[socketListId].onicecandidate = (event) => {
             if (event.candidate != null) {
               console.log(`🧊 ICE Candidate for ${socketListId}:`, {
@@ -477,6 +504,7 @@ export default function VideoMeetComponent() {
             }
           };
 
+          
           connections[socketListId].oniceconnectionstatechange = () => {
             const state = connections[socketListId].iceConnectionState;
             console.log(`ICE State for ${socketListId}: ${state}`);
@@ -544,7 +572,7 @@ export default function VideoMeetComponent() {
 
         if (id === socketIdRef.current) {
           console.log("You are the new joiner, creating offers...");
-
+         
           setTimeout(() => {
             for (let id2 in connections) {
               if (id2 === socketIdRef.current) continue;
@@ -603,6 +631,7 @@ export default function VideoMeetComponent() {
     setMessage("");
   };
 
+  
   let handleEndCall = () => {
     try {
       let tracks = localVideoRef.current.srcObject.getTracks();
@@ -611,17 +640,21 @@ export default function VideoMeetComponent() {
       console.log(e);
     }
 
+    
     for (let id in connections) {
       connections[id].close();
       delete connections[id];
     }
 
+    
     if (socketRef.current) {
       socketRef.current.disconnect();
     }
 
-    routeTo("/home");
+    routeTo("/home")
   };
+
+
 
   return (
     <div>
@@ -760,3 +793,4 @@ export default function VideoMeetComponent() {
     </div>
   );
 }
+
