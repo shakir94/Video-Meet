@@ -651,7 +651,7 @@ export default function VideoMeetComponent() {
       socketRef.current.disconnect();
     }
 
-    window.location.href = "/home";
+    routeTo("/home")
   };
 
 
