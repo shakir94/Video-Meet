@@ -21,30 +21,6 @@ var connections = {};
 const peerconfigConnections = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun3.l.google.com:19302" },
-    { urls: "stun:stun4.l.google.com:19302" },
-    {
-      urls: "turn:openrelay.metered.ca:80",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443?transport=tcp",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-    {
-      urls: "turn:numb.viagenie.ca",
-      username: "webrtc@live.com",
-      credential: "muazkh",
-    },
   ],
   iceCandidatePoolSize: 10,
   iceTransportPolicy: "all",
@@ -76,8 +52,6 @@ export default function VideoMeetComponent() {
 
   const videoRef = useRef([]);
   let [videos, setVideos] = useState([]);
-
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const getPermission = async () => {
     try {
@@ -580,21 +554,21 @@ export default function VideoMeetComponent() {
     });
   };
 
-  // Cleanup on unmount
+  
   useEffect(() => {
     return () => {
-      // Clean up connections
+      
       for (let id in connections) {
         connections[id].close();
         delete connections[id];
       }
       
-      // Disconnect socket
+      
       if (socketRef.current) {
         socketRef.current.disconnect();
       }
       
-      // Stop media tracks
+    
       if (window.localStream) {
         window.localStream.getTracks().forEach((track) => track.stop());
       }
@@ -793,3 +767,4 @@ export default function VideoMeetComponent() {
     </div>
   );
 }
+
